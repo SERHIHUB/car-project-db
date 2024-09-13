@@ -1,7 +1,7 @@
 import createHttpError from 'http-errors';
 import { User } from '../db/models/user.js';
 
-export const auditAccessUser = async (req, res, next) => {
+export const auditAccessDeleteUser = async (req, res, next) => {
   const id = req.params.userId;
   const { owner, role } = req.user;
 
@@ -17,6 +17,14 @@ export const auditAccessUser = async (req, res, next) => {
 
   if (user.owner !== owner) {
     throw createHttpError(403, 'No access, owner is not correct.');
+  }
+
+  if (role === 'admin') {
+    next();
+  }
+
+  if (id !== user._id) {
+    throw createHttpError(403, 'No access, user is not correct.');
   }
 
   next();

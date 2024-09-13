@@ -46,8 +46,8 @@ export const getOneUserController = async (req, res) => {
 
 export const patchUserController = async (req, res) => {
   const id = req.params.userId;
-  const { body } = req;
-  const { user } = await upsertUser(id, body);
+  const { body, file } = req;
+  const { user } = await upsertUser(id, { body: body, file: file });
   // const user = upsertUser(id, body);
 
   res.status(200).json({
@@ -59,9 +59,13 @@ export const patchUserController = async (req, res) => {
 
 export const updateUserController = async (req, res) => {
   const id = req.params.userId;
-  const { body } = req;
+  const { body, file } = req;
 
-  const { isNew, user } = await upsertUser(id, body, { upsert: true });
+  const { isNew, user } = await upsertUser(
+    id,
+    { body: body, file: file },
+    { upsert: true },
+  );
 
   const status = isNew ? 201 : 200;
 

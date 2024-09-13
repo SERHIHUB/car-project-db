@@ -6,87 +6,91 @@ import jwt, { decode } from 'jsonwebtoken';
 import { env } from '../../utils/env.js';
 import { ENV_VARS } from '../../constants/index.js';
 import { sendMail } from '../../utils/sendMail.js';
+import { saveFileToLocalFolder } from '../../utils/saveFileToLocalFolder.js';
 
-export const createUser = async (credentials) => {
-  const hashedPassword = await bcrypt.hash(credentials.password, 10);
+export const createUser = async ({ body, file }) => {
+  const hashedPassword = await bcrypt.hash(body.password, 10);
   const yourVerifyToken = crypto.randomUUID();
+  const url = await saveFileToLocalFolder(file);
 
-  const email = credentials.email;
+  const email = body.email;
 
-  const user = await User.findOne({ email: credentials.email });
+  const user = await User.findOne({ email: body.email });
 
   if (user) {
     throw createHttpError(409, 'This user already exists.');
   }
 
-  const owner = await User.findOne({ email: credentials.owner });
+  const owner = await User.findOne({ email: body.owner });
 
-  // const metaEmail = `serhii.24@meta.ua`;
-
-  if (owner) {
+  if (owner !== null) {
     const newUser = await User.create({
-      ...credentials,
+      ...body,
       owner: owner._id,
       password: hashedPassword,
+      avatarURL: url,
       verifyToken: yourVerifyToken,
     });
 
-    try {
-      await sendMail({
-        to: email,
-        from: env(ENV_VARS.SMTP_SEND_FROM_USER),
-        subject: 'Verify.',
-        html: `
-        <h1>Hello!</h1>
-        <p>
-        To confirm your email please clik on the <a href="${env(
-          ENV_VARS.FRONTEND_HOST,
-        )}/auth/verify/${yourVerifyToken}">Link</a></p>`,
-        text: `To confirm your email please open the link ${env(
-          ENV_VARS.FRONTEND_HOST,
-        )}/auth/verify/${yourVerifyToken}`,
-      });
-    } catch (error) {
-      console.log(error);
-      createHttpError(500, 'Problem with sending emails.');
-    }
+    // try {
+    //   await sendMail({
+    //     to: email,
+    //     from: env(ENV_VARS.SMTP_SEND_FROM_USER),
+    //     subject: 'Verify.',
+    //     html: `
+    //     <h1>Hello!</h1>
+    //     <p>
+    //     To confirm your email please clik on the <a href="${env(
+    //       ENV_VARS.FRONTEND_HOST,
+    //     )}/auth/verify/${yourVerifyToken}">Link</a></p>`,
+    //     text: `To confirm your email please open the link ${env(
+    //       ENV_VARS.FRONTEND_HOST,
+    //     )}/auth/verify/${yourVerifyToken}`,
+    //   });
+    // } catch (error) {
+    //   console.log(error);
+    //   createHttpError(500, 'Problem with sending emails.');
+    // }
     return newUser;
   }
 
   await User.create({
-    ...credentials,
+    ...body,
     password: hashedPassword,
+    avatarURL: url,
     verifyToken: yourVerifyToken,
   });
 
   // ----------------------------------------------------------------------
 
-  await sendMail({
-    to: email,
-    from: env(ENV_VARS.SMTP_SEND_FROM_USER),
-    subject: 'Verify your email.',
-    html: `
-    <h1>Hello!</h1>
-    <p>
-    To confirm your email please clik on the <a href="${env(
-      ENV_VARS.FRONTEND_HOST,
-    )}/auth/verify/${yourVerifyToken}">Link</a></p>`,
-    text: `To confirm your email please open the link ${env(
-      ENV_VARS.FRONTEND_HOST,
-    )}/auth/verify/${yourVerifyToken}`,
-  });
+  // await sendMail({
+  //   to: email,
+  //   from: env(ENV_VARS.SMTP_SEND_FROM_USER),
+  //   subject: 'Verify your email.',
+  //   html: `
+  //   <h1>Hello!</h1>
+  //   <p>
+  //   To confirm your email please clik on the <a href="${env(
+  //     ENV_VARS.FRONTEND_HOST,
+  //   )}/auth/verify/${yourVerifyToken}">Link</a></p>`,
+  //   text: `To confirm your email please open the link ${env(
+  //     ENV_VARS.FRONTEND_HOST,
+  //   )}/auth/verify/${yourVerifyToken}`,
+  // });
 
   // ----------------------------------------------------------------------
 
-  const iAmOwner = await User.findOne({ email: credentials.email });
+  const iAmOwner = await User.findOne({ email: body.email });
 
   return await User.findOneAndUpdate(
-    { email: credentials.email },
+    { email: body.email },
     {
-      ...credentials,
+      ...body,
       owner: iAmOwner._id,
       role: 'admin',
       password: hashedPassword,
+      avatarURL: url,
+      verifyToken: yourVerifyToken,
     },
   );
 };
@@ -95,7 +99,6 @@ export const logInUser = async ({ email, password }) => {
   const user = await User.findOne({ email });
 
   if (!user) {
-    // throw createHttpError(404, 'User not found.');
     throw createHttpError(401, 'Email or password invalid.');
   }
 
@@ -105,15 +108,14 @@ export const logInUser = async ({ email, password }) => {
     throw createHttpError(401, 'Email or password invalid.');
   }
 
-  if (user.verify === false) {
-    throw createHttpError(401, 'Please verify your email.');
-  }
+  // if (user.verify === false) {
+  //   throw createHttpError(401, 'Please verify your email.');
+  // }
 
   const token = jwt.sign(
     {
       id: user._id,
       name: user.name,
-      // email: user.email,
       owner: user.owner,
       role: user.role,
     },

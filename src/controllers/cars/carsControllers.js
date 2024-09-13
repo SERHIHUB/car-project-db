@@ -31,10 +31,14 @@ export const getOneCarController = async (req, res) => {
 };
 
 export const createCarController = async (req, res) => {
-  const body = req.body;
+  // const body = req.body;
+  const { body, file } = req;
   const user = req.user;
 
-  const newCar = await createCar({ body: body, user: user });
+  // console.log(file);
+  // console.log(body);
+
+  const newCar = await createCar({ body: body, user: user, file: file });
 
   res.status(201).json({
     status: 201,
@@ -45,10 +49,10 @@ export const createCarController = async (req, res) => {
 
 export const updateCarController = async (req, res) => {
   const id = req.params.carId;
-  const body = req.body;
+  const { body, file } = req;
   const user = req.user;
 
-  const newEditCar = await editCar(id, { body: body, user: user });
+  const newEditCar = await editCar(id, { body: body, user: user, file: file });
 
   res.status(200).json({
     status: 200,

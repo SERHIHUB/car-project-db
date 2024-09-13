@@ -1,8 +1,14 @@
 import createHttpError from 'http-errors';
 import { Car } from '../../db/models/car.js';
+import { saveFileToLocalFolder } from '../../utils/saveFileToLocalFolder.js';
+// import { saveToCloudinary } from '../../utils/saveToCloudinary.js';
 
-export const createCar = async ({ body, user }) => {
+export const createCar = async ({ body, user, file }) => {
   const myCar = await Car.findOne({ carNumber: body.carNumber });
+  const url = await saveFileToLocalFolder(file);
+  // ----------------------------------------------
+  // const url = await saveToCloudinary(file);
+  // ----------------------------------------------
 
   if (myCar) {
     throw createHttpError(409, 'This car is already listed');
@@ -12,16 +18,22 @@ export const createCar = async ({ body, user }) => {
     ...body,
     owner: user.owner,
     author: user.id,
+    carPhotoURL: url,
   });
 
   return newCar;
 };
 
 export const editCar = async (id, payload) => {
+  const url = await saveFileToLocalFolder(payload.file);
+  // ----------------------------------------------
+  // const url = await saveToCloudinary(file);
+  // ----------------------------------------------
   const updateCar = await Car.findByIdAndUpdate(
     { _id: id },
     {
       ...payload.body,
+      carPhotoURL: url,
       author: payload.user.id,
     },
     {

@@ -8,5 +8,6 @@ export const registerUserSchema = joi.object({
   role: joi.string(),
   thema: joi.string(),
   owner: joi.string(),
+  avatarURL: joi.string(),
   verifyToken: joi.string(),
 });

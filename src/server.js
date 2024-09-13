@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import { env } from './utils/env.js';
-import { ENV_VARS } from './constants/index.js';
+import { ENV_VARS, UPLOAD_DIR } from './constants/index.js';
 import { notFoundMiddleWare } from './middlewares/notFoundMiddleWare.js';
 import { errorHandlerMiddleware } from './middlewares/errorHandlerMiddleware.js';
 import routers from './routers/index.js';
@@ -12,6 +12,8 @@ export const startServer = () => {
   app.use(cors());
 
   app.use(express.json());
+
+  app.use('/upload', express.static(UPLOAD_DIR));
 
   app.use(routers);
 
