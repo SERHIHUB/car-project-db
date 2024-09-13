@@ -1,6 +1,7 @@
 import createHttpError from 'http-errors';
 import { User } from '../../db/models/user.js';
 import bcrypt from 'bcrypt';
+import { saveFileToLocalFolder } from '../../utils/saveFileToLocalFolder.js';
 
 const createPaginationInformation = (page, perPage, count) => {
   const totalPages = Math.ceil(count / perPage);
@@ -50,17 +51,16 @@ export const getOneUser = async (id) => {
   return user;
 };
 
-export const upsertUser = async (id, credentials, options = {}) => {
+export const upsertUser = async (id, { body, file }, options = {}) => {
   // const hashedPassword = await bcrypt.hash(credentials.password, 10);
-
-  // console.log(credentials);
+  const url = await saveFileToLocalFolder(file);
 
   const hashedPassword =
-    credentials.password && (await bcrypt.hash(credentials.password, 10));
+    body.password && (await bcrypt.hash(body.password, 10));
 
-  const credentialsObj = credentials.password
-    ? { ...credentials, password: hashedPassword }
-    : { ...credentials };
+  const credentialsObj = body.password
+    ? { ...body, password: hashedPassword, avatarURL: url }
+    : { ...body, avatarURL: url };
 
   const rawResult = await User.findByIdAndUpdate({ _id: id }, credentialsObj, {
     new: true,

@@ -4,7 +4,7 @@ const carSchema = new Schema(
   {
     carModel: { type: String, required: true },
     carNumber: { type: String, required: true },
-    // carPhoto: { type: String, required: true },
+    carPhotoURL: { type: String, default: null },
     price: { type: String, required: true },
     paymentDate: { type: String, required: true },
     contact: { type: String, default: null },

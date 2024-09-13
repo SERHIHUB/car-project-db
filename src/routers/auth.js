@@ -9,6 +9,7 @@ import {
 } from '../controllers/users/authControllers.js';
 import { auditTokenMiddleware } from '../middlewares/auditTokenMiddleware.js';
 import { logOutMiddleware } from '../middlewares/logOutMIddleware.js';
+import { upload } from '../middlewares/upload.js';
 import { validateBody } from '../middlewares/validateBody.js';
 import { ctrlWrapper } from '../utils/ctrlWrapper.js';
 import { loginUserSchema } from '../validation/auth/loginUserSchema.js';
@@ -20,6 +21,7 @@ const authRouter = Router();
 
 authRouter.post(
   '/register',
+  upload.single('avatar'),
   validateBody(registerUserSchema),
   ctrlWrapper(registerUserController),
 );

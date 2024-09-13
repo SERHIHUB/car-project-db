@@ -9,6 +9,7 @@ import {
 import { auditAccessCars } from '../middlewares/auditAccessCars.js';
 import { auditRoleMiddleware } from '../middlewares/auditRoleMiddleware.js';
 import { auditTokenMiddleware } from '../middlewares/auditTokenMiddleware.js';
+import { upload } from '../middlewares/upload.js';
 import { validateBody } from '../middlewares/validateBody.js';
 import { validateMongoId } from '../middlewares/validateMongoId.js';
 import { ctrlWrapper } from '../utils/ctrlWrapper.js';
@@ -19,6 +20,7 @@ const carRouter = Router();
 
 carRouter.post(
   '/',
+  upload.single('carPhoto'),
   auditTokenMiddleware,
   // ctrlWrapper(auditAccessCars),
   auditRoleMiddleware,
@@ -37,6 +39,7 @@ carRouter.get(
 
 carRouter.patch(
   '/:carId',
+  upload.single('carPhoto'),
   auditTokenMiddleware,
   ctrlWrapper(auditAccessCars),
   // auditRoleMiddleware,

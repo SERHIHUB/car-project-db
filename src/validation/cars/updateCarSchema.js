@@ -8,5 +8,6 @@ export const updateCarSchema = joi.object({
   contact: joi.string(),
   owner: joi.string(),
   author: joi.string(),
+  carPhotoURL: joi.string(),
   // isPaid: joi.boolean(),
 });

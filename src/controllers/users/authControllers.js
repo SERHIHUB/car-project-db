@@ -10,8 +10,10 @@ import {
 export const registerUserController = async (req, res, next) => {
   // 000000000000000000000000000000
   // console.log(req.body);
+  // console.log(req.file);
+  const { body, file } = req;
 
-  const newUser = await createUser(req.body);
+  const newUser = await createUser({ body: body, file: file });
 
   res.status(200).json({
     status: 200,

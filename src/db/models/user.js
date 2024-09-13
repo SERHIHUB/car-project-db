@@ -15,8 +15,7 @@ const userSchema = new Schema(
     owner: { type: String, default: null },
     verify: { type: Boolean, default: false },
     verifyToken: { type: String, default: null },
-    //   userAvatar: { type: String, required: true },
-    // userAvatar: { type: String, default: '...' },
+    avatarURL: { type: String, default: null },
   },
   { versionKey: false },
 );
