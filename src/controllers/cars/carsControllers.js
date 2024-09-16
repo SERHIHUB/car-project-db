@@ -5,12 +5,14 @@ import {
   getAllCars,
   getOneCar,
 } from '../../services/cars/cars.js';
+import { parsePaginationParams } from '../../utils/parsePaginationParams.js';
 
 export const getCarsController = async (req, res) => {
   const owner = req.user.owner;
-  const cars = await getAllCars(owner);
 
-  // console.log(req.user);
+  const { page, perPage } = parsePaginationParams(req.query);
+
+  const cars = await getAllCars({ page, perPage, owner });
 
   res.status(200).json({
     status: 200,
@@ -31,12 +33,8 @@ export const getOneCarController = async (req, res) => {
 };
 
 export const createCarController = async (req, res) => {
-  // const body = req.body;
   const { body, file } = req;
   const user = req.user;
-
-  // console.log(file);
-  // console.log(body);
 
   const newCar = await createCar({ body: body, user: user, file: file });
 

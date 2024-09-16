@@ -1,7 +1,6 @@
 import createHttpError from 'http-errors';
 import jwt from 'jsonwebtoken';
 import { ENV_VARS } from '../constants/index.js';
-import { User } from '../db/models/user.js';
 import { env } from '../utils/env.js';
 
 export const auditTokenMiddleware = (req, res, next) => {
@@ -32,6 +31,4 @@ export const auditTokenMiddleware = (req, res, next) => {
 
     next();
   });
-
-  // next();
 };

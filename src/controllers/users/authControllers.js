@@ -8,9 +8,6 @@ import {
 } from '../../services/users/auth.js';
 
 export const registerUserController = async (req, res, next) => {
-  // 000000000000000000000000000000
-  // console.log(req.body);
-  // console.log(req.file);
   const { body, file } = req;
 
   const newUser = await createUser({ body: body, file: file });
@@ -31,8 +28,6 @@ export const loginUserController = async (req, res, next) => {
     data: user,
   });
 };
-
-// export const refreshTokenController = async (req, res, next) => {};
 
 export const logOutUserController = async (req, res, next) => {
   const id = req.user.id;
@@ -66,8 +61,6 @@ export const verifyToken = async (req, res, next) => {
   const { token } = req.params;
 
   await verifyUserToken(token);
-
-  console.log(token);
 
   res.status(200).json({
     status: 200,

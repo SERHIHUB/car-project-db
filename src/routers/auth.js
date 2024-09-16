@@ -32,8 +32,6 @@ authRouter.post(
   ctrlWrapper(loginUserController),
 );
 
-// authRouter.post('/refresh-token');
-
 authRouter.post(
   '/logout',
   auditTokenMiddleware,

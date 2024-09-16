@@ -10,6 +10,8 @@ cloudinary.config({
 });
 
 export const saveToCloudinary = async (file) => {
+  if (!file) return;
+
   const res = await cloudinary.uploader.upload(file.path);
   await fs.unlink(file.path);
 

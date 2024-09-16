@@ -2,6 +2,7 @@ import createHttpError from 'http-errors';
 import { User } from '../../db/models/user.js';
 import bcrypt from 'bcrypt';
 import { saveFileToLocalFolder } from '../../utils/saveFileToLocalFolder.js';
+import { deleteFile } from '../../utils/deleteFile.js';
 
 const createPaginationInformation = (page, perPage, count) => {
   const totalPages = Math.ceil(count / perPage);
@@ -20,8 +21,6 @@ const createPaginationInformation = (page, perPage, count) => {
 
 export const getUsers = async ({ page = 1, perPage = 4, owner }) => {
   const skip = perPage * (page - 1);
-  // const usersCount = await User.find().countDocuments();
-  // const users = await User.find().skip(skip).limit(perPage);
 
   const [usersCount, users] = await Promise.all([
     User.find().countDocuments(),
@@ -38,7 +37,6 @@ export const getUsers = async ({ page = 1, perPage = 4, owner }) => {
     users,
     ...paginationInformation,
   };
-  // return users;
 };
 
 export const getOneUser = async (id) => {
@@ -52,15 +50,22 @@ export const getOneUser = async (id) => {
 };
 
 export const upsertUser = async (id, { body, file }, options = {}) => {
-  // const hashedPassword = await bcrypt.hash(credentials.password, 10);
-  const url = await saveFileToLocalFolder(file);
+  const { url, filePath } = await saveFileToLocalFolder(file);
+
+  const userById = await User.findOne({ _id: id });
+  if (!userById) {
+    throw createHttpError(404, 'User was not found.');
+  }
+
+  const oldUrl = userById.avatarURL;
+  const photoUrl = url === null ? oldUrl : url;
 
   const hashedPassword =
     body.password && (await bcrypt.hash(body.password, 10));
 
   const credentialsObj = body.password
-    ? { ...body, password: hashedPassword, avatarURL: url }
-    : { ...body, avatarURL: url };
+    ? { ...body, password: hashedPassword, avatarURL: photoUrl }
+    : { ...body, avatarURL: photoUrl };
 
   const rawResult = await User.findByIdAndUpdate({ _id: id }, credentialsObj, {
     new: true,
@@ -68,21 +73,12 @@ export const upsertUser = async (id, { body, file }, options = {}) => {
     ...options,
   });
 
-  // const rawResult = await User.findByIdAndUpdate(
-  //   { _id: id },
-  //   {
-  //     ...credentials,
-  //     password: hashedPassword,
-  //   },
-  //   {
-  //     new: true,
-  //     includeResultMetadata: true,
-  //     ...options,
-  //   },
-  // );
-
   if (!rawResult || !rawResult.value) {
     throw createHttpError(404, 'User was not found.');
+  }
+
+  if (url !== null) {
+    await deleteFile(oldUrl);
   }
 
   return {
@@ -91,10 +87,12 @@ export const upsertUser = async (id, { body, file }, options = {}) => {
   };
 };
 
-// export const verifyUserToken = async () => {
-//   console.log('Verify');
-// };
-
 export const deleteUser = async (id) => {
+  const user = await User.findOne({ _id: id });
+  if (!user) {
+    throw createHttpError(404, 'User was not found.');
+  }
+  await deleteFile(user.avatarURL);
+
   await User.findByIdAndDelete({ _id: id });
 };
