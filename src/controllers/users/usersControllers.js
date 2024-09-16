@@ -1,5 +1,4 @@
 import {
-  // createUser,
   deleteUser,
   getOneUser,
   getUsers,
@@ -10,7 +9,6 @@ import { parsePaginationParams } from '../../utils/parsePaginationParams.js';
 export const getUsersController = async (req, res) => {
   const owner = req.user.owner;
 
-  // const users = await getUsers();
   const { page, perPage } = parsePaginationParams(req.query);
 
   const users = await getUsers({ page, perPage, owner });
@@ -33,22 +31,10 @@ export const getOneUserController = async (req, res) => {
   });
 };
 
-// export const createUserController = async (req, res) => {
-//   const { body } = req;
-//   const createNewUser = await createUser(body);
-
-//   res.status(201).json({
-//     status: 201,
-//     message: `Successfully created new user`,
-//     data: createNewUser,
-//   });
-// };
-
 export const patchUserController = async (req, res) => {
   const id = req.params.userId;
   const { body, file } = req;
   const { user } = await upsertUser(id, { body: body, file: file });
-  // const user = upsertUser(id, body);
 
   res.status(200).json({
     status: 200,

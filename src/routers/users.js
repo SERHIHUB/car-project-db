@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import {
-  // createUserController,
   deleteUserController,
   patchUserController,
   getOneUserController,
@@ -19,8 +18,6 @@ import { upload } from '../middlewares/upload.js';
 
 const userRouter = Router();
 
-// userRouter.use('/:userId', validateMongoId('userId'));
-
 userRouter.get('/', auditTokenMiddleware, ctrlWrapper(getUsersController));
 
 userRouter.get(
@@ -30,17 +27,11 @@ userRouter.get(
   ctrlWrapper(getOneUserController),
 );
 
-// userRouter.post(
-//   '/',
-//   validateBody(createUserSchema),
-//   ctrlWrapper(createUserController),
-// );
-
 userRouter.patch(
   '/:userId',
 
   auditTokenMiddleware,
-  ctrlWrapper(auditAccessUser),
+  // ctrlWrapper(auditAccessUser),
   validateMongoId('userId'),
   upload.single('avatar'),
   validateBody(updateUserSchema),
@@ -60,7 +51,7 @@ userRouter.put(
 userRouter.delete(
   '/:userId',
   auditTokenMiddleware,
-  ctrlWrapper(auditAccessDeleteUser),
+  // ctrlWrapper(auditAccessDeleteUser),
   validateMongoId('userId'),
   ctrlWrapper(deleteUserController),
 );

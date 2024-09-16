@@ -6,7 +6,6 @@ import {
   getContactsController,
 } from '../controllers/contacts/contactsControllers.js';
 import { auditAccessContact } from '../middlewares/auditAccessContact.js';
-import { auditRoleMiddleware } from '../middlewares/auditRoleMiddleware.js';
 import { auditTokenMiddleware } from '../middlewares/auditTokenMiddleware.js';
 import { validateBody } from '../middlewares/validateBody.js';
 import { validateMongoId } from '../middlewares/validateMongoId.js';
@@ -19,8 +18,7 @@ const contactRouter = Router();
 contactRouter.post(
   '/',
   auditTokenMiddleware,
-  // ctrlWrapper(auditAccessContact),
-  auditRoleMiddleware,
+  ctrlWrapper(auditAccessContact),
   validateBody(createContactSchema),
   ctrlWrapper(createContactController),
 );
@@ -29,7 +27,6 @@ contactRouter.patch(
   '/:contactId',
   auditTokenMiddleware,
   ctrlWrapper(auditAccessContact),
-  // auditRoleMiddleware,
   validateMongoId('contactId'),
   validateBody(updateContactSchema),
   ctrlWrapper(editContactController),
@@ -45,7 +42,6 @@ contactRouter.delete(
   '/:contactId',
   auditTokenMiddleware,
   ctrlWrapper(auditAccessContact),
-  // auditRoleMiddleware,
   validateMongoId('contactId'),
   ctrlWrapper(deleteContactController),
 );

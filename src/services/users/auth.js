@@ -7,17 +7,18 @@ import { env } from '../../utils/env.js';
 import { ENV_VARS } from '../../constants/index.js';
 import { sendMail } from '../../utils/sendMail.js';
 import { saveFileToLocalFolder } from '../../utils/saveFileToLocalFolder.js';
+import fs from 'node:fs/promises';
 
 export const createUser = async ({ body, file }) => {
   const hashedPassword = await bcrypt.hash(body.password, 10);
   const yourVerifyToken = crypto.randomUUID();
-  const url = await saveFileToLocalFolder(file);
-
+  const { url, filePath } = await saveFileToLocalFolder(file);
   const email = body.email;
 
   const user = await User.findOne({ email: body.email });
 
   if (user) {
+    await fs.unlink(filePath);
     throw createHttpError(409, 'This user already exists.');
   }
 
@@ -32,25 +33,25 @@ export const createUser = async ({ body, file }) => {
       verifyToken: yourVerifyToken,
     });
 
-    // try {
-    //   await sendMail({
-    //     to: email,
-    //     from: env(ENV_VARS.SMTP_SEND_FROM_USER),
-    //     subject: 'Verify.',
-    //     html: `
-    //     <h1>Hello!</h1>
-    //     <p>
-    //     To confirm your email please clik on the <a href="${env(
-    //       ENV_VARS.FRONTEND_HOST,
-    //     )}/auth/verify/${yourVerifyToken}">Link</a></p>`,
-    //     text: `To confirm your email please open the link ${env(
-    //       ENV_VARS.FRONTEND_HOST,
-    //     )}/auth/verify/${yourVerifyToken}`,
-    //   });
-    // } catch (error) {
-    //   console.log(error);
-    //   createHttpError(500, 'Problem with sending emails.');
-    // }
+    try {
+      await sendMail({
+        to: email,
+        from: env(ENV_VARS.SMTP_SEND_FROM_USER),
+        subject: 'Verify.',
+        html: `
+        <h1>Hello!</h1>
+        <p>
+        To confirm your email please clik on the <a href="${env(
+          ENV_VARS.FRONTEND_HOST,
+        )}/auth/verify/${yourVerifyToken}">Link</a></p>`,
+        text: `To confirm your email please open the link ${env(
+          ENV_VARS.FRONTEND_HOST,
+        )}/auth/verify/${yourVerifyToken}`,
+      });
+    } catch (error) {
+      console.log(error);
+      createHttpError(500, 'Problem with sending emails.');
+    }
     return newUser;
   }
 
@@ -61,24 +62,20 @@ export const createUser = async ({ body, file }) => {
     verifyToken: yourVerifyToken,
   });
 
-  // ----------------------------------------------------------------------
-
-  // await sendMail({
-  //   to: email,
-  //   from: env(ENV_VARS.SMTP_SEND_FROM_USER),
-  //   subject: 'Verify your email.',
-  //   html: `
-  //   <h1>Hello!</h1>
-  //   <p>
-  //   To confirm your email please clik on the <a href="${env(
-  //     ENV_VARS.FRONTEND_HOST,
-  //   )}/auth/verify/${yourVerifyToken}">Link</a></p>`,
-  //   text: `To confirm your email please open the link ${env(
-  //     ENV_VARS.FRONTEND_HOST,
-  //   )}/auth/verify/${yourVerifyToken}`,
-  // });
-
-  // ----------------------------------------------------------------------
+  await sendMail({
+    to: email,
+    from: env(ENV_VARS.SMTP_SEND_FROM_USER),
+    subject: 'Verify your email.',
+    html: `
+    <h1>Hello!</h1>
+    <p>
+    To confirm your email please clik on the <a href="${env(
+      ENV_VARS.FRONTEND_HOST,
+    )}/auth/verify/${yourVerifyToken}">Link</a></p>`,
+    text: `To confirm your email please open the link ${env(
+      ENV_VARS.FRONTEND_HOST,
+    )}/auth/verify/${yourVerifyToken}`,
+  });
 
   const iAmOwner = await User.findOne({ email: body.email });
 
@@ -108,9 +105,9 @@ export const logInUser = async ({ email, password }) => {
     throw createHttpError(401, 'Email or password invalid.');
   }
 
-  // if (user.verify === false) {
-  //   throw createHttpError(401, 'Please verify your email.');
-  // }
+  if (user.verify === false) {
+    throw createHttpError(401, 'Please verify your email.');
+  }
 
   const token = jwt.sign(
     {
@@ -127,10 +124,6 @@ export const logInUser = async ({ email, password }) => {
 
   await User.findByIdAndUpdate(user._id, { token });
 
-  // const accessToken = crypto.randomBytes(10).toString('base64');
-  // const refreshToken = crypto.randomBytes(10).toString('base64');
-
-  // return { accessToken, refreshToken };
   return { token };
 };
 
@@ -157,14 +150,7 @@ export const sendResetPassword = async (email) => {
   if (!user) {
     createHttpError(404, 'User was not found.');
   }
-
-  // console.log(user);
-
   const token = jwt.sign(
-    // {
-    //   id: user._id,
-    //   email,
-    // },
     {
       email,
     },
@@ -173,12 +159,6 @@ export const sendResetPassword = async (email) => {
       expiresIn: '14h',
     },
   );
-
-  // const metaEmail = `serhii.24@meta.ua`;
-  // const gmailEmail = `chokorik@gmail.com`;
-
-  // <a href="${env(ENV_VARS.FRONTEND_HOST)}/reset-password?token=${token}"
-  // Посилання на  сторінку з формою для ввода пароля
 
   try {
     await sendMail({
@@ -196,7 +176,6 @@ export const sendResetPassword = async (email) => {
       )}/auth/reset-password/${token}`,
     });
   } catch (error) {
-    // console.log('oops!');
     console.log(error);
     createHttpError(500, 'Problem with sending emails.');
   }
@@ -205,8 +184,6 @@ export const sendResetPassword = async (email) => {
 export const resetPassword = async ({ password, token }) => {
   let tokenPayload;
 
-  // console.log(password);
-
   try {
     tokenPayload = jwt.verify(token, env(ENV_VARS.JWT_SECRET));
   } catch (error) {
@@ -214,8 +191,6 @@ export const resetPassword = async ({ password, token }) => {
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
-
-  // console.log(tokenPayload);
 
   await User.findOneAndUpdate(
     {

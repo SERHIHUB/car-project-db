@@ -7,7 +7,6 @@ import {
   updateCarController,
 } from '../controllers/cars/carsControllers.js';
 import { auditAccessCars } from '../middlewares/auditAccessCars.js';
-import { auditRoleMiddleware } from '../middlewares/auditRoleMiddleware.js';
 import { auditTokenMiddleware } from '../middlewares/auditTokenMiddleware.js';
 import { upload } from '../middlewares/upload.js';
 import { validateBody } from '../middlewares/validateBody.js';
@@ -23,7 +22,6 @@ carRouter.post(
   upload.single('carPhoto'),
   auditTokenMiddleware,
   // ctrlWrapper(auditAccessCars),
-  auditRoleMiddleware,
   validateBody(createCarSchema),
   ctrlWrapper(createCarController),
 );
@@ -41,8 +39,7 @@ carRouter.patch(
   '/:carId',
   upload.single('carPhoto'),
   auditTokenMiddleware,
-  ctrlWrapper(auditAccessCars),
-  // auditRoleMiddleware,
+  // ctrlWrapper(auditAccessCars),
   validateMongoId('carId'),
   validateBody(updateCarSchema),
   ctrlWrapper(updateCarController),
@@ -51,8 +48,7 @@ carRouter.patch(
 carRouter.delete(
   '/:carId',
   auditTokenMiddleware,
-  ctrlWrapper(auditAccessCars),
-  // auditRoleMiddleware,
+  // ctrlWrapper(auditAccessCars),
   validateMongoId('carId'),
   ctrlWrapper(deleteCarController),
 );
