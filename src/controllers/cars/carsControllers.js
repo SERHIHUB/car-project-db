@@ -11,11 +11,8 @@ import { parsePaginationParams } from '../../utils/parsePaginationParams.js';
 export const getCarsController = async (req, res) => {
   const owner = req.user.owner;
 
-  // const { paid } = req.query;
-  // const filter = { paid };
-  // console.log(req.query.paid);
   const filter = parseFilters(req.query);
-  // console.log(filter);
+
   const { page, perPage } = parsePaginationParams(req.query);
 
   const cars = await getAllCars({ page, perPage, filter, owner });
