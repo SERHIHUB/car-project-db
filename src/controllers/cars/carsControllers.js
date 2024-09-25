@@ -5,14 +5,17 @@ import {
   getAllCars,
   getOneCar,
 } from '../../services/cars/cars.js';
+import { parseFilters } from '../../utils/parseFilters.js';
 import { parsePaginationParams } from '../../utils/parsePaginationParams.js';
 
 export const getCarsController = async (req, res) => {
   const owner = req.user.owner;
 
+  const filter = parseFilters(req.query);
+
   const { page, perPage } = parsePaginationParams(req.query);
 
-  const cars = await getAllCars({ page, perPage, owner });
+  const cars = await getAllCars({ page, perPage, filter, owner });
 
   res.status(200).json({
     status: 200,

@@ -72,12 +72,26 @@ export const editCar = async (id, payload) => {
   return updateCar;
 };
 
-export const getAllCars = async ({ page = 1, perPage = 2, owner }) => {
+export const getAllCars = async ({
+  page = 1,
+  perPage = 2,
+  filter = {},
+  owner,
+}) => {
   const skip = perPage * (page - 1);
 
+  const carsQuery = Car.find({ owner });
+
+  if (filter.paid) {
+    carsQuery.where('isPaid').equals(filter.paid);
+  }
+  if (!filter.paid) {
+    carsQuery.where('isPaid').equals(filter.paid);
+  }
+
   const [carsCount, cars] = await Promise.all([
-    Car.find().countDocuments(),
-    Car.find({ owner }).skip(skip).limit(perPage),
+    Car.find().merge(carsQuery).countDocuments(),
+    carsQuery.skip(skip).limit(perPage).exec(),
   ]);
 
   const paginationInformation = createPaginationInformation(
