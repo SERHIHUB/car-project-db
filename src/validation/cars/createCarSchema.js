@@ -10,4 +10,6 @@ export const createCarSchema = joi.object({
   author: joi.string(),
   carPhotoURL: joi.string(),
   isPaid: joi.boolean(),
+  lastPaidDate: joi.string(),
+  isPaidMonth: joi.string(),
 });

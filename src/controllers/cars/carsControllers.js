@@ -55,6 +55,30 @@ export const updateCarController = async (req, res) => {
 
   const newEditCar = await editCar(id, { body: body, user: user, file: file });
 
+  // _______________________________________________________________
+
+  // const paidMonth = ('Month: ', newEditCar.updatedAt.getMonth());
+
+  // console.log(paidMonth);
+  // const time = new Date();
+  // const newTime = new Date('2024-09-26T17:54:12.001Z');
+
+  // console.log(newEditCar.updatedAt);
+
+  // console.log(newTime);
+
+  // console.log(Date.now());
+
+  // console.log(new Date());
+
+  // console.log(newTime.getFullYear());
+
+  // console.log(newTime.getMonth());
+
+  // console.log(newTime.getDay());
+
+  // ________________________________________________________________
+
   res.status(200).json({
     status: 200,
     message: 'Successfully updated car.',

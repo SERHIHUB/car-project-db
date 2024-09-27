@@ -8,9 +8,11 @@ const carSchema = new Schema(
     price: { type: String, required: true },
     paymentDate: { type: String, required: true },
     contact: { type: String, default: null },
-    isPaid: { type: Boolean, default: false },
+    isPaid: { type: Boolean, default: true },
     owner: { type: String, default: null },
     author: { type: String, default: null },
+    lastPaidDate: { type: String, default: new Date() },
+    isPaidMonth: { type: String, default: new Date().getMonth() + 1 },
   },
   { timestamps: true, versionKey: false },
 );

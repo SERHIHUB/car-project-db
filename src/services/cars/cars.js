@@ -3,6 +3,8 @@ import { Car } from '../../db/models/car.js';
 import { saveFileToLocalFolder } from '../../utils/saveFileToLocalFolder.js';
 import fs from 'node:fs/promises';
 import { deleteFile } from '../../utils/deleteFile.js';
+import { deleteFileIfRepeat } from '../../utils/deleteFileIfRepeat.js';
+import { abonementIsActive } from '../../utils/abonementIsActive.js';
 // import { saveToCloudinary } from '../../utils/saveToCloudinary.js';
 
 const createPaginationInformation = (page, perPage, count) => {
@@ -22,15 +24,41 @@ const createPaginationInformation = (page, perPage, count) => {
 
 export const createCar = async ({ body, user, file }) => {
   const myCar = await Car.findOne({ carNumber: body.carNumber });
+
   const { url, filePath } = await saveFileToLocalFolder(file);
+
+  // console.log(body);
+
+  if (myCar) {
+    // await fs.unlink(filePath);
+    await deleteFileIfRepeat(filePath);
+    throw createHttpError(409, 'This car is already listed');
+  }
+
   // ----------------------------------------------
   // const url = await saveToCloudinary(file);
   // ----------------------------------------------
 
-  if (myCar) {
-    await fs.unlink(filePath);
-    throw createHttpError(409, 'This car is already listed');
-  }
+  // console.log(filePath);
+
+  // if (myCar) {
+  //   await fs.unlink(filePath);
+  //   deleteFileIfRepeat(filePath);
+  //   throw createHttpError(409, 'This car is already listed');
+  // }
+
+  // console.log(filePath);
+
+  // if (myCar) {
+  //   try {
+  //     await fs.unlink(filePath);
+  //     console.log('delete file');
+  //   } catch (error) {
+  //     console.log('URL was not found.');
+  //     console.log(filePath);
+  //   }
+  //   throw createHttpError(409, 'This car is already listed');
+  // }
 
   const newCar = await Car.create({
     ...body,
@@ -50,16 +78,56 @@ export const editCar = async (id, payload) => {
     throw createHttpError(404, 'Car was not found.');
   }
 
+  // ------
+
   const oldUrl = car.carPhotoURL;
   const photoUrl = url === null ? oldUrl : url;
 
+  // _________________________________________________________________
+
+  const currentPaidMonth = abonementIsActive({
+    dayOfPaid: car.lastPaidDate,
+    lastUpdateDate: car.updatedAt,
+  });
+
+  // const currentPaidMonth = 8;
+
+  const now = new Date();
+  const currentMonth = now.getMonth() + 1;
+
+  const isCarPaid = currentMonth <= currentPaidMonth;
+
+  // console.log(currentPaidMonth);
+  // console.log(isCarPaid);
+
+  const editCarObject = payload.body.lastPaidDate
+    ? {
+        ...payload.body,
+        carPhotoURL: photoUrl,
+        author: payload.user.id,
+        isPaid: isCarPaid,
+        isPaidMonth: currentPaidMonth,
+      }
+    : {
+        ...payload.body,
+        carPhotoURL: photoUrl,
+        author: payload.user.id,
+        isPaid: isCarPaid,
+      };
+  // _________________________________________________________________
+
+  // const oldUrl = car.carPhotoURL;
+  // const photoUrl = url === null ? oldUrl : url;
+
   const updateCar = await Car.findByIdAndUpdate(
     { _id: id },
-    {
-      ...payload.body,
-      carPhotoURL: photoUrl,
-      author: payload.user.id,
-    },
+    // {
+    //   ...payload.body,
+    //   carPhotoURL: photoUrl,
+    //   author: payload.user.id,
+    //   isPaidMonth: currentPaidMonth,
+    // },
+    editCarObject,
     {
       new: true,
     },
@@ -112,6 +180,12 @@ export const getOneCar = async (id) => {
   if (!car) {
     throw createHttpError(401, 'Car was not found');
   }
+
+  // abonementIsActive(car.paidDate);
+
+  // const myDate = new Date(car.paidDate);
+
+  // console.log(myDate.getMonth() + 1);
 
   return car;
 };
