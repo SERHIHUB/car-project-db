@@ -5,6 +5,7 @@ import { UPLOAD_DIR, ENV_VARS, TEMP_UPLOAD_DIR } from '../constants/index.js';
 
 import imagemin from 'imagemin';
 import imageminMozjpeg from 'imagemin-mozjpeg';
+import { Car } from '../db/models/car.js';
 
 export const saveFileToLocalFolder = async (file) => {
   const dirFiles = await fs.readdir(
@@ -37,7 +38,7 @@ export const saveFileToLocalFolder = async (file) => {
         destination: UPLOAD_DIR,
         plugins: [
           imageminMozjpeg({
-            quality: [10],
+            quality: [8],
           }),
         ],
       });

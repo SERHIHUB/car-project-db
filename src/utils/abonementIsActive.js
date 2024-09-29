@@ -1,40 +1,59 @@
-const someDay =
-  'Thu Sep 26 2024 23:41:55 GMT+0300 (за східноєвропейським літнім часом)';
+import createHttpError from 'http-errors';
 
-export const abonementIsActive = ({ dayOfPaid, lastUpdateDate }) => {
-  const nowPaidDate = new Date(dayOfPaid);
-  let lastPaid = new Date(lastUpdateDate);
-  // const datePaid = nowPaidDate.getDate();
-  // console.log(myDate);
+export const abonementIsActive = ({
+  // lastDateOfPaid,
+  carIsPaidMonth,
+  paymentDate,
+}) => {
+  // lastDateOfPaid це: (lastPaidDate: Fri Sep 27 2024 17:42:48 GMT+0300 (за східноєвропейським літнім часом))
+  // const lastPaidDate = new Date(lastDateOfPaid);
+  // console.log(`lastPaidDate = ${lastPaidDate}`);
 
-  // console.log();
-
-  // якщо оплата здійснена в поточному місяці
+  // Поточний місяць
   const now = new Date();
-  // const year = now.getFullYear();
+  const currentDate = now.getDate();
   const currentMonth = now.getMonth() + 1;
+  const currentYear = now.getFullYear();
 
-  // const daysInMonth = new Date(year, currentMonth, 0).getDate();
+  // ourPaidMonth проплачений місяць = (9)
+  const ourPaidMonth = carIsPaidMonth;
+  // console.log(`ourPaidMonth = ${ourPaidMonth}`);
 
-  const monthOfPaid = nowPaidDate.getMonth() + 1;
+  const nextOurPaidDate = new Date(currentYear, ourPaidMonth, currentDate);
+  // console.log(`nextOurPaidDate = ${nextOurPaidDate}`);
 
-  let currentPaidMonth;
+  // Наступний проплачений місяць
+  const nextOurPaidMonth = nextOurPaidDate.getMonth() + 1;
+  // console.log(`nextOurPaidMonth = ${nextOurPaidMonth}`);
 
-  if (currentMonth === monthOfPaid) {
-    lastPaid.setMonth(monthOfPaid);
-    currentPaidMonth = lastPaid.getMonth() + 1;
+  // Число оплати
+  const dateOfPaid = paymentDate;
+  // console.log(`dateOfPaid = ${dateOfPaid}`);
+
+  //  Якщо оплата здійснюється в кінці місяця (проплаченого), nextPaidDate = + 2 місяці, інакше = + 1 місяць
+  // ================================================
+  const nextPaidDate =
+    currentMonth == ourPaidMonth
+      ? new Date(currentYear, currentMonth + 2, dateOfPaid)
+      : new Date(currentYear, currentMonth + 1, dateOfPaid);
+
+  // console.log(`nextPaidDate = ${nextPaidDate}`);
+
+  const nowTime = now.getTime();
+  const nextPaidTime = nextPaidDate.getTime();
+  // console.log(`nowTime = ${nowTime}`);
+  // console.log(`nextPaidTime = ${nextPaidTime}`);
+
+  // =========================================================
+  const isCarPaid = nowTime <= nextPaidTime ? true : false;
+
+  // Якщо намагаємося заплатити повторно
+  if (currentMonth < ourPaidMonth) {
+    // console.log('Current month is paid');
+    throw createHttpError(409, 'Current month is paid.');
   }
 
-  if (currentMonth > monthOfPaid) {
-    lastPaid.setMonth(currentMonth);
-    currentPaidMonth = lastPaid.getMonth();
-  }
+  const paidObject = { isCarPaid, nextOurPaidMonth };
 
-  // console.log(`currentPaidMonth = ${currentPaidMonth}`);
-
-  // const isPaid = datePaid < daysInMonth ? true : false;
-
-  // console.log(currentPaidMonth);
-
-  return currentPaidMonth;
+  return paidObject;
 };
