@@ -22,7 +22,7 @@ export const createUser = async ({ body, file }) => {
     throw createHttpError(409, 'This user already exists.');
   }
 
-  const owner = await User.findOne({ email: body.owner });
+  const owner = body.owner == '' ? null : await User.findOne({ email: body.owner });
 
   if (owner !== null) {
     const newUser = await User.create({
