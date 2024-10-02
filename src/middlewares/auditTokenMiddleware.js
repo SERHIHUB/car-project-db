@@ -4,7 +4,9 @@ import { ENV_VARS } from '../constants/index.js';
 import { env } from '../utils/env.js';
 
 export const auditTokenMiddleware = (req, res, next) => {
-  const authorizationHeader = req.headers.Authorization;
+  console.log(req.headers);
+  // const authorizationHeader = req.headers.authorization;
+  const authorizationHeader = req.get('Authorization');
 
   if (typeof authorizationHeader === 'undefined') {
     throw createHttpError(401, 'Invalid token');
