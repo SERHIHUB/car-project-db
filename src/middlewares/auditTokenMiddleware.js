@@ -4,7 +4,7 @@ import { ENV_VARS } from '../constants/index.js';
 import { env } from '../utils/env.js';
 
 export const auditTokenMiddleware = (req, res, next) => {
-  const authorizationHeader = req.headers.authorization;
+  const authorizationHeader = req.headers.Authorization;
 
   if (typeof authorizationHeader === 'undefined') {
     throw createHttpError(401, 'Invalid token');
@@ -12,8 +12,8 @@ export const auditTokenMiddleware = (req, res, next) => {
 
   const [bearer, token] = authorizationHeader.split(' ', 2);
 
-  if (bearer !== 'Bearer') {
-    throw createHttpError(401, 'Invalid token');
+  if (bearer !== 'Bearer' || !token) {
+    throw createHttpError(401, 'Invalid token.');
   }
 
   jwt.verify(token, env(ENV_VARS.JWT_SECRET), (err, decode) => {
