@@ -21,9 +21,9 @@ const userRouter = Router();
 userRouter.get('/', auditTokenMiddleware, ctrlWrapper(getUsersController));
 
 userRouter.get(
-  '/:userId',
+  '/user',
   auditTokenMiddleware,
-  validateMongoId('userId'),
+  // validateMongoId('userId'),
   ctrlWrapper(getOneUserController),
 );
 

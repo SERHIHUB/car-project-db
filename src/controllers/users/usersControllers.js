@@ -21,7 +21,7 @@ export const getUsersController = async (req, res) => {
 };
 
 export const getOneUserController = async (req, res) => {
-  const id = req.params.userId;
+  const id = req.user.id;
   const user = await getOneUser(id);
 
   res.status(200).json({
