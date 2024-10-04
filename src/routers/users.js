@@ -5,6 +5,7 @@ import {
   getOneUserController,
   getUsersController,
   updateUserController,
+  currentUserController,
 } from '../controllers/users/usersControllers.js';
 import { validateMongoId } from '../middlewares/validateMongoId.js';
 import { auditTokenMiddleware } from '../middlewares/auditTokenMiddleware.js';
@@ -25,6 +26,12 @@ userRouter.get(
   auditTokenMiddleware,
   // validateMongoId('userId'),
   ctrlWrapper(getOneUserController),
+);
+
+userRouter.get(
+  '/current',
+  auditTokenMiddleware,
+  ctrlWrapper(currentUserController),
 );
 
 userRouter.patch(
