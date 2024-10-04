@@ -1,5 +1,6 @@
 import {
   deleteUser,
+  getCurrentUser,
   getOneUser,
   getUsers,
   upsertUser,
@@ -27,6 +28,17 @@ export const getOneUserController = async (req, res) => {
   res.status(200).json({
     status: 200,
     message: `Successfully get user by ${id}`,
+    data: user,
+  });
+};
+
+export const currentUserController = async (req, res) => {
+  const currentToken = req.user.token;
+  const user = await getCurrentUser(currentToken);
+
+  res.status(200).json({
+    status: 200,
+    message: 'Successfully get current user',
     data: user,
   });
 };

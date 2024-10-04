@@ -49,6 +49,20 @@ export const getOneUser = async (id) => {
   return user;
 };
 
+export const getCurrentUser = async (token) => {
+  if (!token) {
+    throw createHttpError(401, 'Current token is missing.');
+  }
+
+  const user = await User.findOne({ token: token });
+
+  if (!user) {
+    throw createHttpError(404, 'Current user was not found.');
+  }
+
+  return user;
+};
+
 export const upsertUser = async (id, { body, file }, options = {}) => {
   const { url, filePath } = await saveFileToLocalFolder(file);
 
