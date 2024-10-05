@@ -135,7 +135,7 @@ export const getAllCars = async ({
 
   return {
     cars,
-    ...paginationInformation,
+    paginationInformation,
   };
 };
 
