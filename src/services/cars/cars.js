@@ -114,10 +114,11 @@ export const getAllCars = async ({
 
   const carsQuery = Car.find({ owner });
 
-  if (filter.paid) {
+  if (filter.paid && filter.paid !== undefined) {
     carsQuery.where('isPaid').equals(filter.paid);
   }
-  if (!filter.paid) {
+
+  if (!filter.paid && filter.paid !== undefined) {
     carsQuery.where('isPaid').equals(filter.paid);
   }
 

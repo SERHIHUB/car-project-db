@@ -4,7 +4,6 @@ import { ENV_VARS } from '../constants/index.js';
 import { env } from '../utils/env.js';
 
 export const auditTokenMiddleware = (req, res, next) => {
-  console.log(req.headers);
   // const authorizationHeader = req.headers.authorization;
   const authorizationHeader = req.get('Authorization');
 
