@@ -18,7 +18,6 @@ const contactRouter = Router();
 contactRouter.post(
   '/',
   auditTokenMiddleware,
-  ctrlWrapper(auditAccessContact),
   validateBody(createContactSchema),
   ctrlWrapper(createContactController),
 );
