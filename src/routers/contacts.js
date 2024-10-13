@@ -25,8 +25,8 @@ contactRouter.post(
 contactRouter.patch(
   '/:contactId',
   auditTokenMiddleware,
-  ctrlWrapper(auditAccessContact),
   validateMongoId('contactId'),
+  ctrlWrapper(auditAccessContact),
   validateBody(updateContactSchema),
   ctrlWrapper(editContactController),
 );

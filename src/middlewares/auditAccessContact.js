@@ -18,4 +18,6 @@ export const auditAccessContact = async (req, res, next) => {
   if (contact.owner !== owner) {
     throw createHttpError(403, 'No access, owner is not correct.');
   }
+
+  next();
 };

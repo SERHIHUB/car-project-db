@@ -39,8 +39,8 @@ carRouter.patch(
   '/:carId',
   upload.single('carPhoto'),
   auditTokenMiddleware,
-  // ctrlWrapper(auditAccessCars),
   validateMongoId('carId'),
+  ctrlWrapper(auditAccessCars),
   validateBody(updateCarSchema),
   ctrlWrapper(updateCarController),
 );
@@ -48,8 +48,8 @@ carRouter.patch(
 carRouter.delete(
   '/:carId',
   auditTokenMiddleware,
-  // ctrlWrapper(auditAccessCars),
   validateMongoId('carId'),
+  ctrlWrapper(auditAccessCars),
   ctrlWrapper(deleteCarController),
 );
 
