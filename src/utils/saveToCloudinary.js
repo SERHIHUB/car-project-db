@@ -1,7 +1,11 @@
 import { v2 as cloudinary } from 'cloudinary';
 import fs from 'node:fs/promises';
+import path from 'node:path';
 import { env } from './env.js';
-import { ENV_VARS } from '../constants/index.js';
+import { ENV_VARS, TEMP_UPLOAD_DIR, UPLOAD_DIR } from '../constants/index.js';
+
+// import imagemin from 'imagemin';
+// import imageminMozjpeg from 'imagemin-mozjpeg';
 
 cloudinary.config({
   cloud_name: env(ENV_VARS.CLOUDINARY_NAME),
@@ -10,10 +14,26 @@ cloudinary.config({
 });
 
 export const saveToCloudinary = async (file) => {
-  if (!file) return;
+  if (!file) {
+    return { url: null };
+  }
+  // ----------------------------
+  const dirFiles = await fs.readdir(
+    TEMP_UPLOAD_DIR,
+    { recursive: true },
+    (err) => {
+      console.error(err);
+    },
+  );
+
+  for (const dirFile of dirFiles) {
+    path.join(TEMP_UPLOAD_DIR, dirFile) !== file.path &&
+      (await fs.unlink(path.join(TEMP_UPLOAD_DIR, dirFile)));
+  }
 
   const res = await cloudinary.uploader.upload(file.path);
+
   await fs.unlink(file.path);
 
-  return res.secure_url;
+  return { url: res.secure_url };
 };

@@ -4,7 +4,7 @@ import { saveFileToLocalFolder } from '../../utils/saveFileToLocalFolder.js';
 import { deleteFile } from '../../utils/deleteFile.js';
 import { abonementIsActive } from '../../utils/abonementIsActive.js';
 
-// import { saveToCloudinary } from '../../utils/saveToCloudinary.js';
+import { saveToCloudinary } from '../../utils/saveToCloudinary.js';
 
 const createPaginationInformation = (page, perPage, count) => {
   const totalPages = Math.ceil(count / perPage);
@@ -48,7 +48,8 @@ export const createCar = async ({ body, user, file }) => {
 };
 
 export const editCar = async (id, payload) => {
-  const { url } = await saveFileToLocalFolder(payload.file);
+  // const { url } = await saveFileToLocalFolder(payload.file);
+  const { url } = await saveToCloudinary(payload.file);
 
   const car = await Car.findOne({ _id: id });
   if (!car) {
@@ -97,9 +98,9 @@ export const editCar = async (id, payload) => {
     },
   );
 
-  if (url !== null) {
-    await deleteFile(oldUrl);
-  }
+  // if (url !== null) {
+  //   await deleteFile(oldUrl);
+  // }
 
   return updateCar;
 };
