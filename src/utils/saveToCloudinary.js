@@ -31,7 +31,12 @@ export const saveToCloudinary = async (file) => {
       (await fs.unlink(path.join(TEMP_UPLOAD_DIR, dirFile)));
   }
 
-  const res = await cloudinary.uploader.upload(file.path);
+  const res = await cloudinary.uploader.upload(file.path, {
+    transformation: {
+      width: 480,
+      // height: 380,
+    },
+  });
 
   await fs.unlink(file.path);
 

@@ -1,10 +1,12 @@
 import createHttpError from 'http-errors';
 import { Car } from '../../db/models/car.js';
-import { saveFileToLocalFolder } from '../../utils/saveFileToLocalFolder.js';
-import { deleteFile } from '../../utils/deleteFile.js';
+// import { saveFileToLocalFolder } from '../../utils/saveFileToLocalFolder.js';
+// import { deleteFile } from '../../utils/deleteFile.js';
 import { abonementIsActive } from '../../utils/abonementIsActive.js';
 
 import { saveToCloudinary } from '../../utils/saveToCloudinary.js';
+// import { v2 as cloudinary } from 'cloudinary';
+import { deleteCloudinaryFile } from '../../utils/deleteCloudinaryFile.js';
 
 const createPaginationInformation = (page, perPage, count) => {
   const totalPages = Math.ceil(count / perPage);
@@ -24,18 +26,12 @@ const createPaginationInformation = (page, perPage, count) => {
 export const createCar = async ({ body, user, file }) => {
   const myCar = await Car.findOne({ carNumber: body.carNumber });
 
-  const { url, filePath } = await saveFileToLocalFolder(file);
+  // const { url, filePath } = await saveFileToLocalFolder(file);
+  const { url } = await saveToCloudinary(file);
 
-  // треба видаляти фото при додаванні існуючого авто !!!!!!!!!!!!!!!!!!!!!!!!!!!
   if (myCar) {
-    // await deleteFile(filePath);
-
     throw createHttpError(409, 'This car is already listed');
   }
-
-  // ----------------------------------------------
-  // const url = await saveToCloudinary(file);
-  // ----------------------------------------------
 
   const newCar = await Car.create({
     ...body,
@@ -54,6 +50,10 @@ export const editCar = async (id, payload) => {
   const car = await Car.findOne({ _id: id });
   if (!car) {
     throw createHttpError(404, 'Car was not found.');
+  }
+
+  if (url && car.carPhotoURL) {
+    await deleteCloudinaryFile(car.carPhotoURL);
   }
 
   const oldUrl = car.carPhotoURL;
@@ -84,23 +84,9 @@ export const editCar = async (id, payload) => {
         isPaid: currentPaidObj.isCarPaid,
       };
 
-  const updateCar = await Car.findByIdAndUpdate(
-    { _id: id },
-    // {
-    //   ...payload.body,
-    //   carPhotoURL: photoUrl,
-    //   author: payload.user.id,
-    //   isPaidMonth: currentPaidMonth,
-    // },
-    editCarObject,
-    {
-      new: true,
-    },
-  );
-
-  // if (url !== null) {
-  //   await deleteFile(oldUrl);
-  // }
+  const updateCar = await Car.findByIdAndUpdate({ _id: id }, editCarObject, {
+    new: true,
+  });
 
   return updateCar;
 };
@@ -155,7 +141,8 @@ export const deleteCar = async (id) => {
   if (!car) {
     throw createHttpError(404, 'Car was not found.');
   }
-  await deleteFile(car.carPhotoURL);
+
+  await deleteCloudinaryFile(car.carPhotoURL);
 
   await Car.findByIdAndDelete({ _id: id });
 };
