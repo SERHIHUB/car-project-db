@@ -1,8 +1,10 @@
 import createHttpError from 'http-errors';
 import { User } from '../../db/models/user.js';
 import bcrypt from 'bcrypt';
-import { saveFileToLocalFolder } from '../../utils/saveFileToLocalFolder.js';
-import { deleteFile } from '../../utils/deleteFile.js';
+// import { saveFileToLocalFolder } from '../../utils/saveFileToLocalFolder.js';
+// import { deleteFile } from '../../utils/deleteFile.js';
+import { saveToCloudinary } from '../../utils/saveToCloudinary.js';
+import { deleteCloudinaryFile } from '../../utils/deleteCloudinaryFile.js';
 
 const createPaginationInformation = (page, perPage, count) => {
   const totalPages = Math.ceil(count / perPage);
@@ -64,11 +66,16 @@ export const getCurrentUser = async (token) => {
 };
 
 export const upsertUser = async (id, { body, file }, options = {}) => {
-  const { url, filePath } = await saveFileToLocalFolder(file);
+  // const { url, filePath } = await saveFileToLocalFolder(file);
+  const { url } = await saveToCloudinary(file);
 
   const userById = await User.findOne({ _id: id });
   if (!userById) {
     throw createHttpError(404, 'User was not found.');
+  }
+
+  if (url && userById.avatarURL) {
+    await deleteCloudinaryFile(userById.avatarURL);
   }
 
   const oldUrl = userById.avatarURL;
@@ -91,10 +98,6 @@ export const upsertUser = async (id, { body, file }, options = {}) => {
     throw createHttpError(404, 'User was not found.');
   }
 
-  if (url !== null) {
-    await deleteFile(oldUrl);
-  }
-
   return {
     user: rawResult.value,
     isNew: !rawResult?.lastErrorObject?.updatedExisting,
@@ -106,7 +109,8 @@ export const deleteUser = async (id) => {
   if (!user) {
     throw createHttpError(404, 'User was not found.');
   }
-  await deleteFile(user.avatarURL);
+
+  await deleteCloudinaryFile(user.avatarURL);
 
   await User.findByIdAndDelete({ _id: id });
 };
