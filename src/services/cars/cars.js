@@ -142,7 +142,9 @@ export const deleteCar = async (id) => {
     throw createHttpError(404, 'Car was not found.');
   }
 
-  await deleteCloudinaryFile(car.carPhotoURL);
+  if (car.carPhotoURL) {
+    await deleteCloudinaryFile(car.carPhotoURL);
+  }
 
   await Car.findByIdAndDelete({ _id: id });
 };

@@ -110,7 +110,9 @@ export const deleteUser = async (id) => {
     throw createHttpError(404, 'User was not found.');
   }
 
-  await deleteCloudinaryFile(user.avatarURL);
+  if (user.avatarURL) {
+    await deleteCloudinaryFile(user.avatarURL);
+  }
 
   await User.findByIdAndDelete({ _id: id });
 };
