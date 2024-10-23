@@ -37,5 +37,8 @@ export const getAllContacts = async (owner) => {
 };
 
 export const deleteContact = async (id) => {
-  await Contact.findByIdAndDelete({ _id: id });
+  const response = await Contact.findByIdAndDelete({ _id: id });
+
+  return response;
+  // await Contact.findByIdAndDelete({ _id: id });
 };

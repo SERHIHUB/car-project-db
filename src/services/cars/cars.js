@@ -146,5 +146,8 @@ export const deleteCar = async (id) => {
     await deleteCloudinaryFile(car.carPhotoURL);
   }
 
-  await Car.findByIdAndDelete({ _id: id });
+  const response = await Car.findByIdAndDelete({ _id: id });
+
+  return response;
+  // await Car.findByIdAndDelete({ _id: id });
 };

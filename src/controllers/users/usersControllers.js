@@ -77,7 +77,15 @@ export const updateUserController = async (req, res) => {
 export const deleteUserController = async (req, res) => {
   const id = req.params.userId;
 
-  await deleteUser(id);
+  const userDelete = await deleteUser(id);
 
-  res.status(204).send();
+  // await deleteUser(id);
+
+  // res.status(204).send();
+
+  res.status(200).json({
+    status: 200,
+    message: 'Successfully delete user.',
+    data: userDelete,
+  });
 };

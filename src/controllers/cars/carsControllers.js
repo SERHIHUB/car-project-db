@@ -65,7 +65,15 @@ export const updateCarController = async (req, res) => {
 export const deleteCarController = async (req, res) => {
   const id = req.params.carId;
 
-  await deleteCar(id);
+  const carDelete = await deleteCar(id);
 
-  res.status(204).send();
+  // await deleteCar(id);
+
+  // res.status(204).send();
+
+  res.status(200).json({
+    status: 200,
+    message: 'Successfully delete car.',
+    data: carDelete,
+  });
 };

@@ -44,7 +44,15 @@ export const getContactsController = async (req, res) => {
 export const deleteContactController = async (req, res) => {
   const id = req.params.contactId;
 
-  await deleteContact(id);
+  const contactDelete = await deleteContact(id);
 
-  res.status(204).send();
+  // await deleteContact(id);
+
+  // res.status(204).send();
+
+  res.status(200).json({
+    status: 200,
+    message: 'Successfully delete contact.',
+    data: contactDelete,
+  });
 };
