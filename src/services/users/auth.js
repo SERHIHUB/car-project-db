@@ -51,7 +51,7 @@ export const createUser = async ({ body, file }) => {
       });
     } catch (error) {
       console.log(error);
-      createHttpError(500, 'Problem with sending emails.');
+      throw createHttpError(500, 'Problem with sending emails.');
     }
     return newUser;
   }
@@ -136,7 +136,7 @@ export const verifyUserToken = async (token) => {
   const user = await User.findOne({ verifyToken: token });
 
   if (!user) {
-    createHttpError(404, 'User was not found.');
+    throw createHttpError(404, 'User was not found.');
   }
 
   await User.findByIdAndUpdate(user._id, {
@@ -149,7 +149,7 @@ export const sendResetPassword = async (email) => {
   const user = await User.findOne({ email });
 
   if (!user) {
-    createHttpError(404, 'User was not found.');
+    throw createHttpError(404, 'User was not found.');
   }
   const token = jwt.sign(
     {
@@ -178,7 +178,7 @@ export const sendResetPassword = async (email) => {
     });
   } catch (error) {
     console.log(error);
-    createHttpError(500, 'Problem with sending emails.');
+    throw createHttpError(500, 'Problem with sending emails.');
   }
 };
 
