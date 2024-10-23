@@ -114,5 +114,8 @@ export const deleteUser = async (id) => {
     await deleteCloudinaryFile(user.avatarURL);
   }
 
-  await User.findByIdAndDelete({ _id: id });
+  const response = await User.findByIdAndDelete({ _id: id });
+
+  return response;
+  // await User.findByIdAndDelete({ _id: id });
 };
