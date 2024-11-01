@@ -69,6 +69,8 @@ export const editCar = async (id, payload) => {
     });
   }
 
+  // console.log(payload.body)
+
   const editCarObject = payload.body.lastPaidDate
     ? {
         ...payload.body,
@@ -81,7 +83,7 @@ export const editCar = async (id, payload) => {
         ...payload.body,
         carPhotoURL: photoUrl,
         author: payload.user.id,
-        isPaid: currentPaidObj.isCarPaid,
+        // isPaid: currentPaidObj.isCarPaid,
       };
 
   const updateCar = await Car.findByIdAndUpdate({ _id: id }, editCarObject, {
