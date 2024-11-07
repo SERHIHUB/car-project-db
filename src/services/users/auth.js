@@ -44,10 +44,10 @@ export const createUser = async ({ body, file }) => {
         <p>
         To confirm your email please clik on the <a href="${env(
           ENV_VARS.FRONTEND_HOST,
-        )}/auth-verify/${yourVerifyToken}">Link</a></p>`,
+        )}/auth/verify/${yourVerifyToken}">Link</a></p>`,
         text: `To confirm your email please open the link ${env(
           ENV_VARS.FRONTEND_HOST,
-        )}/auth-verify/${yourVerifyToken}`,
+        )}/auth/verify/${yourVerifyToken}`,
       });
     } catch (error) {
       console.log(error);
