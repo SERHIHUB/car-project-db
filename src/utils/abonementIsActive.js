@@ -23,7 +23,17 @@ export const abonementIsActive = ({
   // console.log(`nextOurPaidDate = ${nextOurPaidDate}`);
 
   // Наступний проплачений місяць
-  const nextOurPaidMonth = nextOurPaidDate.getMonth() + 1;
+  // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  // const nextOurPaidMonth = nextOurPaidDate.getMonth() + 1;
+  // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  let nextOurPaidMonth;
+
+  if (currentMonth == 12) {
+    nextOurPaidMonth = 1;
+  } else {
+    nextOurPaidMonth = nextOurPaidDate.getMonth() + 1;
+  }
   // console.log(`nextOurPaidMonth = ${nextOurPaidMonth}`);
 
   // Число оплати
@@ -32,10 +42,22 @@ export const abonementIsActive = ({
 
   //  Якщо оплата здійснюється в кінці місяця (проплаченого), nextPaidDate = + 2 місяці, інакше = + 1 місяць
   // ================================================
-  const nextPaidDate =
-    currentMonth == ourPaidMonth
-      ? new Date(currentYear, currentMonth + 2, dateOfPaid)
-      : new Date(currentYear, currentMonth + 1, dateOfPaid);
+  // const nextPaidDate =
+  //   currentMonth == ourPaidMonth
+  //     ? new Date(currentYear, currentMonth + 2, dateOfPaid)
+  //     : new Date(currentYear, currentMonth + 1, dateOfPaid);
+
+  // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&-and-year
+  let nextPaidDate;
+
+  if (currentMonth == 12 && ourPaidMonth == 12) {
+    nextPaidDate = new Date(currentYear + 1, 1, dateOfPaid);
+  } else if (currentMonth == ourPaidMonth) {
+    nextPaidDate = new Date(currentYear, currentMonth + 2, dateOfPaid);
+  } else {
+    nextPaidDate = new Date(currentYear, currentMonth + 1, dateOfPaid);
+  }
+  // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
   // console.log(`nextPaidDate = ${nextPaidDate}`);
 
