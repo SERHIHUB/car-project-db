@@ -16,7 +16,7 @@ export const abonementIsActive = ({
   const currentYear = now.getFullYear();
 
   // ourPaidMonth проплачений місяць = (9)
-  let ourPaidMonth = currentMonth == 1 ? 1 : carIsPaidMonth;
+  let ourPaidMonth = currentMonth == 1 ? 0 : carIsPaidMonth;
   // console.log(`ourPaidMonth = ${ourPaidMonth}`);
 
   const nextOurPaidDate = new Date(currentYear, ourPaidMonth, currentDate);
@@ -42,21 +42,21 @@ export const abonementIsActive = ({
 
   //  Якщо оплата здійснюється в кінці місяця (проплаченого), nextPaidDate = + 2 місяці, інакше = + 1 місяць
   // ================================================
-  // const nextPaidDate =
-  //   currentMonth == ourPaidMonth
-  //     ? new Date(currentYear, currentMonth + 2, dateOfPaid)
-  //     : new Date(currentYear, currentMonth + 1, dateOfPaid);
+  const nextPaidDate =
+    currentMonth == ourPaidMonth
+      ? new Date(currentYear, currentMonth + 2, dateOfPaid)
+      : new Date(currentYear, currentMonth + 1, dateOfPaid);
 
   // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&-and-year
-  let nextPaidDate;
+  // let nextPaidDate;
 
-  if (currentMonth == 12 && ourPaidMonth == 12) {
-    nextPaidDate = new Date(currentYear + 1, 1, dateOfPaid);
-  } else if (currentMonth == ourPaidMonth) {
-    nextPaidDate = new Date(currentYear, currentMonth + 2, dateOfPaid);
-  } else {
-    nextPaidDate = new Date(currentYear, currentMonth + 1, dateOfPaid);
-  }
+  // if (currentMonth == 12 && ourPaidMonth == 12) {
+  //   nextPaidDate = new Date(currentYear + 1, 1, dateOfPaid);
+  // } else if (currentMonth == ourPaidMonth) {
+  //   nextPaidDate = new Date(currentYear, currentMonth + 2, dateOfPaid);
+  // } else {
+  //   nextPaidDate = new Date(currentYear, currentMonth + 1, dateOfPaid);
+  // }
   // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
   // console.log(`nextPaidDate = ${nextPaidDate}`);
@@ -70,7 +70,7 @@ export const abonementIsActive = ({
   const isCarPaid = nowTime <= nextPaidTime ? true : false;
 
   // Якщо намагаємося заплатити повторно
-  if (currentMonth < ourPaidMonth) {
+  if (currentMonth < ourPaidMonth * 1) {
     // console.log('Current month is paid');
     throw createHttpError(409, 'Current month is paid.');
   }
