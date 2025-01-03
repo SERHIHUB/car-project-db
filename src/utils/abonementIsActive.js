@@ -16,7 +16,7 @@ export const abonementIsActive = ({
   const currentYear = now.getFullYear();
 
   // ourPaidMonth проплачений місяць = (9)
-  const ourPaidMonth = carIsPaidMonth;
+  let ourPaidMonth = currentMonth == 1 ? 1 : carIsPaidMonth;
   // console.log(`ourPaidMonth = ${ourPaidMonth}`);
 
   const nextOurPaidDate = new Date(currentYear, ourPaidMonth, currentDate);
